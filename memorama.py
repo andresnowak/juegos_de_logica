@@ -5,21 +5,20 @@
 '''
 from tkinter import * 
 from platform import system
-from time import sleep
 from threading import Thread
 from numpy.random import randint as rnd
+from timer import Time
 
 #_thread.start_new_thread(update,())
 
+#TODO: fix bug by deativating buttons,  where clicking restart menu or start make them stay on scene
 class memorama(Thread):
     def __init__(self, window):
         self.window = window
 
-        self.window.geometry("400x300")
-        spacer = Label(self.window, text="", padx=50)
-        spacer.grid(column=0, row=0)
-        self.title = Label(self.window, text="Memorama", pady=20)
+        self.title = Label(self.window, text="Memorama", pady=20, font=("Arial", 20))
         self.title.grid(column=1, row=0) #comienza desde cero la col y row
+
         self.start_game = False
         self.count_obj = 0
 
@@ -31,12 +30,33 @@ class memorama(Thread):
         self.list_btn_clicked = []
         self.dict_btn = {}
         self.correct_buttons = []
+        self.list_objs_canvas = []
+
+        self.menu_clk = False
+        self.level = 1
+        self.completed = 0
+        self.wrong_ans = 0
+        self.score_lvl = 0
+        self.total_score = 0
+        self.n_max = 7 #el numero maximo default que es 6, ya que random de numpy no tac el ultimo numero
 
         self.start()
 
     def start(self):
         """this function starts the game with option that 
         was chosen for the game"""
+        self.start_game = False
+        self.menu_clk = False
+        self.dict_btn = {}
+
+        self.window.geometry("400x300")
+        self.title.grid(column=1, row=0)
+        self.window.rowconfigure(1, minsize=1)
+        self.window.columnconfigure(3, minsize=3)
+
+        spacer = Label(self.window, text="", padx=50)
+        spacer.grid(column=0, row=0)
+
         sum_sub = Button(self.window, width = 20, height = 2, text="sum and substraction", command=lambda: self.option_chosen(1))
         mul_div = Button(self.window, width = 20, height = 2, text="division and multiplication", command=lambda: self.option_chosen(2))
         self.list_objs_canvas = [sum_sub, mul_div]
@@ -47,29 +67,51 @@ class memorama(Thread):
         #self.create_butons(list_op)
 
     def restart_clicked(self):
-        if self.start_game == True:
-            if self.option == 1:
-                self.list_op = self.sum_substraction()
-            elif self.option == 2:
-                self.list_op = self.mul_div()
-
+        if not self.menu_clk:
+            self.total_score = 0
             self.start_game = False
-            self.destroy_objs_start()
+            self.completed = 0
+            self.wrong_ans = 0
+
+            self.option_chosen(self.option)       
 
     def start_clicked(self):
-        if self.start_game == False:
+        if self.start_game == False and self.menu_clk == False:
             self.btns_blank(self.dict_btn)
             self.start_game = True
 
-    def option_chosen(self, option):
+    def menu_clicked(self):
+        self.menu_clk = True
+        list_objs = [self.score_label, self.restart_btn, self.start_btn, self.menu_btn, self.completed_label]
+
+        self.completed = 0
+
+        self.list_objs_canvas += list_objs
+        self.start_game = False
+
+        self.destroy_objs()
+
+    def destroy_objs(self):
+        if self.count_obj < len(self.list_objs_canvas):
+            self.list_objs_canvas[self.count_obj].destroy()
+
+            self.count_obj += 1
+            self.window.after(100, self.destroy_objs)
+        else:
+            self.dict_btn = {}
+            self.count_obj = 0
+            self.list_objs_canvas = []
+            self.start()
+
+    def option_chosen(self, option, n_max=11):
         self.option = option
 
         if option == 1:
-            self.list_op = self.sum_substraction()
+            self.list_op = self.sum_substraction(n_max=n_max)
         elif option == 2:
-            self.list_op = self.mul_div()
+            self.list_op = self.mul_div(n_max=n_max)
         
-        self.window.after(500, self.destroy_objs_start)
+        self.window.after(200, self.destroy_objs_start)
 
     def destroy_objs_start(self):
         if self.count_obj < len(self.list_objs_canvas):
@@ -84,21 +126,29 @@ class memorama(Thread):
             self.start_game_func()
 
     def start_game_func(self):
-            self.window.geometry("600x500")
+            self.window.geometry("600x620")
 
             self.title.grid(column=2, row=0)
 
+            self.menu_btn = Button(self.window, width = 5, height = 2, text="Menu", command=lambda: self.menu_clicked())
+            self.menu_btn.grid(column=0, row=0)
+            
+            self.score_label = Label(self.window, width = 12, height = 2, text=f"score: {self.total_score}", font=("Arial", 14))
+            self.score_label.grid(column=4, row=0)
+
+            self.completed_label = Label(self.window, width = 12, height = 2, text=f"completed: {self.completed}/5", font=("Arial", 14))
+            self.completed_label.grid(column=3, row=0)
+
             self.start_btn = Button(self.window, width = 5, height = 2, text="start", command=lambda: self.start_clicked()) #Tienes que hacerlo lambda para que el comando no se active automaticamente
-            self.start_btn.grid(column=0, row=0)
+            self.start_btn.grid(column=0, row=1)
 
             self.restart_btn = Button(self.window, width = 5, height = 2, text="restart", command=lambda: self.restart_clicked()) #Tienes que hacerlo lambda para que el comando no se active automaticamente
-            self.restart_btn.grid(column=4, row=0)
-            self.list_objs_canvas = [self.start_btn, self.restart_btn]
+            self.restart_btn.grid(column=4, row=1)
+            self.list_objs_canvas = []
 
             self.list_op = self.randomizer(self.list_op)
 
             self.create_butons(self.list_op)
-
 
     def btns_blank(self, list_btn):
         for btn in list_btn:
@@ -137,10 +187,33 @@ class memorama(Thread):
                     btn.configure(text=self.dict_btn[btn], bg="red")
 
         if verify == False:
+            self.wrong_ans += 1
             self.window.after(1500, self.incorrect_answer)
         else:
-            self.start_game = True
+            self.total_score = self.score(self.total_score)
+            self.score_lvl = self.score(self.score_lvl)
+            self.wrong_ans = 0
+
+            self.score_label.configure(text=f"score: {self.total_score}")
             self.list_btn_clicked = [] 
+            
+            if len(self.correct_buttons) == len(self.dict_btn):
+                self.start_game == False
+                self.completed += 1
+
+                self.correct_buttons = []
+                self.dict_btn = {}
+
+                if self.completed == 6:
+                    self.completed_game()
+                else:
+                    self.levels(self.score_lvl)
+
+                    self.score_lvl = 0
+                    self.option_chosen(self.option, self.n_max)
+                    self.destroy_objs_start
+            else:
+                self.start_game = True
 
     def incorrect_answer(self):
         """ 
@@ -161,9 +234,9 @@ class memorama(Thread):
         this function creates the buttons for the memorama
         """
         i = 0
-        for row in range(1, 5):
+        for row in range(2, 6):
             for col in range(5):
-                btn = Button(self.window, width=10, height=5, text=str(list_op[i]))
+                btn = Button(self.window, width=10, height=5, text=str(list_op[i]), font=("Arial", 15))
                 btn.grid(column = col, row = row)
 
                 if self.system == "mac":
@@ -178,7 +251,7 @@ class memorama(Thread):
 
                 i += 1
 
-    def sum_substraction(self, n_op=10):
+    def sum_substraction(self, n_op=10, n_max=7):
         """
         This function creates a list of sum and substractions operations
         """
@@ -189,8 +262,8 @@ class memorama(Thread):
         list_op = []
 
         for _ in range(n_op):
-            a = rnd(1, 11)
-            b = rnd(1, 11)
+            a = rnd(1, n_max) #hasta el 11 ya que es numpy.random y no toca el ultimo numero y no random
+            b = rnd(1, n_max)
             sum_or_sub = rnd(0,2)
 
             if sum_or_sub == 0:
@@ -204,7 +277,7 @@ class memorama(Thread):
 
         return list_op
 
-    def mul_div(self, n_op = 10):
+    def mul_div(self, n_op = 10, n_max = 7):
         """
         This function creates a list of sum and substractions operations
         """
@@ -216,8 +289,8 @@ class memorama(Thread):
         list_op = []
 
         while n < n_op:
-            a = rnd(1, 11)
-            b = rnd(1, 11)
+            a = rnd(1, n_max)#hasta el 11 ya que es numpy.random y no toca el ultimo numero y no random
+            b = rnd(1, n_max)
             mul_or_div = rnd(0,2)
 
             if mul_or_div == 0:
@@ -236,6 +309,22 @@ class memorama(Thread):
             list_op.append(str(int(total)))
 
         return list_op
+
+    def score(self, score):
+        correct = 200
+        wrong = 10
+
+        score += (correct - (self.wrong_ans*wrong))
+
+        return score
+
+    def levels(self, score):
+        if score >= 1800:
+            self.n_max += 6
+        elif score >= 1500:
+            self.n_max += 4
+        elif score >= 1200:
+            self.n_max += 2
         
     def randomizer(self, list_op):
         """
@@ -254,6 +343,45 @@ class memorama(Thread):
                 list_rnd.append(rnd_n)
 
         return list_new_op
+
+    def completed_game(self):
+        self.start_game == False
+        list_objs = [self.score_label, self.restart_btn, self.start_btn, self.menu_btn, self.completed_label]
+
+        self.list_objs_canvas += list_objs
+        self.destroy_objs_end()
+
+    def destroy_objs_end(self):
+        if self.count_obj < len(self.list_objs_canvas):
+            self.list_objs_canvas[self.count_obj].destroy()
+
+            self.count_obj += 1
+            self.window.after(100, self.destroy_objs_end)
+        else:
+            self.dict_btn = {}
+            self.count_obj = 0
+            self.list_objs_canvas = []
+            self.start_game = True
+
+            self.menu_end()
+
+    def menu_end(self):
+        self.window.geometry("400x420")
+
+        spacer = Label(self.window, text="", padx=50)
+        spacer.grid(column=0, row=0)
+        self.title.grid(column=1, row=0)
+
+        self.score_label_end = Label(self.window, width = 12, height = 2, text=f"score: {self.total_score}", font=("Arial", 21))
+        self.score_label_end.grid(column=1, row=1)
+
+        self.menu = Button(self.window, width = 15, height = 3, font=("Arial", 21), text="Menu", command=lambda: self.menu_clicked())
+        self.menu.grid(column=1, row=2)
+
+        self.restart = Button(self.window, width = 15, height = 3, font=("Arial", 21), text="Restart", command=lambda: self.restart_clicked())
+        self.restart.grid(column=1, row=3)
+
+        self.list_objs_canvas = [self.score_label_end, self.menu, self.restart]
 
     def verifier(self):
         """
@@ -288,7 +416,7 @@ class memorama(Thread):
         op = ""
 
         for btn in self.list_btn_clicked:
-            if len(self.dict_btn[btn]) <= 2:
+            if len(self.dict_btn[btn]) <= 4:
                 result_op = self.dict_btn[btn]
             else:
                 op = self.dict_btn[btn]
