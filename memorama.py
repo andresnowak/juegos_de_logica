@@ -11,7 +11,7 @@ from timer import Time
 
 #_thread.start_new_thread(update,())
 
-#TODO: fix bug by deativating buttons,  where clicking restart menu or start make them stay on scene
+#TODO: fix bug by deactivating buttons,  where clicking restart menu or start make them stay on scene
 class memorama(Thread):
     def __init__(self, window):
         self.window = window
@@ -38,7 +38,7 @@ class memorama(Thread):
         self.wrong_ans = 0
         self.score_lvl = 0
         self.total_score = 0
-        self.n_max = 7 #el numero maximo default que es 6, ya que random de numpy no tac el ultimo numero
+        self.n_max = 7 #el numero maximo default que es 6, ya que random de numpy no toca el ultimo numero
 
         self.start()
 
@@ -57,17 +57,24 @@ class memorama(Thread):
         spacer = Label(self.window, text="", padx=50)
         spacer.grid(column=0, row=0)
 
-        sum_sub = Button(self.window, width = 20, height = 2, text="sum and substraction", command=lambda: self.option_chosen(1))
-        mul_div = Button(self.window, width = 20, height = 2, text="division and multiplication", command=lambda: self.option_chosen(2))
-        self.list_objs_canvas = [sum_sub, mul_div]
+        sum_sub = Button(self.window, width = 23, height = 2, text="sum and substraction", command=lambda: self.option_chosen(1))
+        mul_div = Button(self.window, width = 23, height = 2, text="division and multiplication", command=lambda: self.option_chosen(2))
+        sum_sub_mul_div = Button(self.window, width = 23, height = 4, text="sum substraction,\n division, and multiplication", command=lambda: self.option_chosen(3))
+
+        self.list_objs_canvas = [sum_sub, mul_div, sum_sub_mul_div]
 
         sum_sub.grid(column=1, row=1)
         mul_div.grid(column=1, row=2)
+        sum_sub_mul_div.grid(column=1, row=3)
 
-        #self.create_butons(list_op)
+    def disable_btns(self):
+        self.restart_btn["state"] = "disabled"
+        self.start_btn["state"] = "disabled"
+        self.menu_btn["state"] = "disabled"
 
     def restart_clicked(self):
         if not self.menu_clk:
+            self.disable_btns()
             self.total_score = 0
             self.start_game = False
             self.completed = 0
@@ -87,6 +94,7 @@ class memorama(Thread):
         self.completed = 0
 
         self.list_objs_canvas += list_objs
+        self.disable_btns()
         self.start_game = False
 
         self.destroy_objs()
@@ -103,13 +111,23 @@ class memorama(Thread):
             self.list_objs_canvas = []
             self.start()
 
-    def option_chosen(self, option, n_max=11):
+    def option_chosen(self, option, n_op = 10, n_max = 7):
         self.option = option
 
         if option == 1:
             self.list_op = self.sum_substraction(n_max=n_max)
         elif option == 2:
             self.list_op = self.mul_div(n_max=n_max)
+        elif option == 3:
+            a = rnd(4, 6) #operations 4 or 6
+            if a == 4:
+                b = 6
+            else:
+                b = 4
+                a = 6
+
+            self.list_op = self.sum_substraction(n_op=a, n_max=n_max)
+            self.list_op += self.mul_div(n_op=b, n_max=n_max)
         
         self.window.after(200, self.destroy_objs_start)
 
@@ -210,7 +228,7 @@ class memorama(Thread):
                     self.levels(self.score_lvl)
 
                     self.score_lvl = 0
-                    self.option_chosen(self.option, self.n_max)
+                    self.option_chosen(self.option, n_max=self.n_max)
                     self.destroy_objs_start
             else:
                 self.start_game = True
