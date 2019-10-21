@@ -91,7 +91,7 @@ class memorama(Thread):
 
     def start_clicked(self):
         if self.start_game == False and self.menu_clk == False:
-            #self.btns_blank(self.dict_btn)
+            self.btns_blank(self.dict_btn)
             self.start_game = True
 
     def menu_clicked(self):
@@ -184,7 +184,10 @@ class memorama(Thread):
     def btn_clicked(self, btn_name):
         if self.start_game == True:
             if btn_name not in self.correct_buttons:
-                btn_name.configure(text=self.dict_btn[btn_name], highlightbackground="blue")
+                if self.system == "mac":
+                    btn_name.configure(text=self.dict_btn[btn_name], highlightbackground="blue")
+                else:
+                    btn_name.configure(text=self.dict_btn[btn_name], bg="blue")
 
                 self.list_btn_clicked.append(btn_name)
 
