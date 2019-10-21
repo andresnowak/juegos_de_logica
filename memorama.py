@@ -75,6 +75,7 @@ class memorama(Thread):
             self.wrong_ans = 0
             list_objs = [self.score_label, self.restart_btn, self.start_btn, self.menu_btn, self.completed_label]
             self.list_objs_canvas += list_objs
+            self.correct_buttons = []
 
             self.option_chosen(self.option)       
 
@@ -219,6 +220,9 @@ class memorama(Thread):
             if len(self.correct_buttons) == len(self.dict_btn):
                 self.start_game == False
                 self.completed += 1
+                list_objs = [self.score_label, self.restart_btn, self.start_btn,self.menu_btn, self.completed_label]
+
+                self.list_objs_canvas += list_objs
 
                 self.correct_buttons = []
                 self.dict_btn = {}
@@ -366,7 +370,9 @@ class memorama(Thread):
         return list_new_op
 
     def completed_game(self):
-        self.start_game == False
+        self.start_game = False
+        self.completed = 0
+        self.menu_clk = True
         list_objs = [self.score_label, self.restart_btn, self.start_btn, self.menu_btn, self.completed_label]
 
         self.list_objs_canvas += list_objs
@@ -383,6 +389,7 @@ class memorama(Thread):
             self.count_obj = 0
             self.list_objs_canvas = []
             self.start_game = True
+            self.menu_clk = False
 
             self.menu_end()
 
@@ -396,13 +403,13 @@ class memorama(Thread):
         self.score_label_end = Label(self.window, width = 12, height = 2, text=f"score: {self.total_score}", font=("Arial", 21))
         self.score_label_end.grid(column=1, row=1)
 
-        self.menu = Button(self.window, width = 15, height = 3, font=("Arial", 21), text="Menu", command=lambda: self.menu_clicked())
-        self.menu.grid(column=1, row=2)
+        self.menu_end_btn = Button(self.window, width = 15, height = 3, font=("Arial", 21), text="Menu", command=lambda: self.menu_clicked())
+        self.menu_end_btn.grid(column=1, row=2)
 
-        self.restart = Button(self.window, width = 15, height = 3, font=("Arial", 21), text="Restart", command=lambda: self.restart_clicked())
-        self.restart.grid(column=1, row=3)
+        self.restart_end = Button(self.window, width = 15, height = 3, font=("Arial", 21), text="Restart", command=lambda: self.restart_clicked())
+        self.restart_end.grid(column=1, row=3)
 
-        self.list_objs_canvas = [self.score_label_end, self.menu, self.restart]
+        self.list_objs_canvas = [self.score_label_end, self.menu_end_btn, self.restart_end]
 
     def verifier(self):
         """
