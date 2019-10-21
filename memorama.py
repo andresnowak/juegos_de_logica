@@ -66,20 +66,9 @@ class memorama(Thread):
         mul_div.grid(column=1, row=2)
         sum_sub_mul_div.grid(column=1, row=3)
 
-    def disable_btns(self):
-        self.restart_btn["state"] = "disabled"
-        self.start_btn["state"] = "disabled"
-        self.menu_btn["state"] = "disabled"
-
-    def enable_btns(self):
-        self.restart_btn["state"] = "normal"
-        self.start_btn["state"] = "normal"
-        self.menu_btn["state"] = "normal"
-
     def restart_clicked(self):
         if not self.menu_clk:
-            self.disable_btns()
-
+            self.menu_clk = True
             self.total_score = 0
             self.start_game = False
             self.completed = 0
@@ -95,17 +84,17 @@ class memorama(Thread):
             self.start_game = True
 
     def menu_clicked(self):
-        self.menu_clk = True
+        if self.menu_clk == False:
+            self.menu_clk = True
 
-        list_objs = [self.score_label, self.restart_btn, self.start_btn, self.menu_btn, self.completed_label]
+            list_objs = [self.score_label, self.restart_btn, self.start_btn, self.menu_btn, self.completed_label]
 
-        self.completed = 0
+            self.completed = 0
 
-        self.list_objs_canvas += list_objs
-        self.start_game = False
-        self.disable_btns()
+            self.list_objs_canvas += list_objs
+            self.start_game = False
 
-        self.destroy_objs()
+            self.destroy_objs()
 
     def destroy_objs(self):
         if self.count_obj < len(self.list_objs_canvas):
@@ -153,7 +142,7 @@ class memorama(Thread):
             self.start_game_func()
 
     def start_game_func(self):
-            self.window.geometry("600x620")
+            self.window.geometry("700x720")
 
             self.title.grid(column=2, row=0)
 
@@ -241,10 +230,7 @@ class memorama(Thread):
 
                     self.score_lvl = 0
                     self.option_chosen(self.option, n_max=self.n_max)
-                    self.disable_btns()
-
-                    list_objs = [self.restart_btn, self.start_btn, self.menu_btn, self.completed_label, self.score_label]
-                    self.list_objs_canvas += list_objs
+                    self.menu_clk = True
 
                     self.destroy_objs_start
             else:
