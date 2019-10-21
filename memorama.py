@@ -82,7 +82,7 @@ class memorama(Thread):
 
     def start_clicked(self):
         if self.start_game == False and self.menu_clk == False:
-            #self.btns_blank(self.dict_btn)
+            self.btns_blank(self.dict_btn)
             self.start_game = True
 
     def menu_clicked(self):
@@ -230,7 +230,7 @@ class memorama(Thread):
                 self.correct_buttons = []
                 self.dict_btn = {}
 
-                if self.completed == 2:
+                if self.completed == 6:
                     self.completed_game()
                 else:
                     self.levels(self.score_lvl)
