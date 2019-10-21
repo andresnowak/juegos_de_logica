@@ -71,30 +71,39 @@ class memorama(Thread):
         self.start_btn["state"] = "disabled"
         self.menu_btn["state"] = "disabled"
 
+    def enable_btns(self):
+        self.restart_btn["state"] = "normal"
+        self.start_btn["state"] = "normal"
+        self.menu_btn["state"] = "normal"
+
     def restart_clicked(self):
         if not self.menu_clk:
             self.disable_btns()
+
             self.total_score = 0
             self.start_game = False
             self.completed = 0
             self.wrong_ans = 0
+            list_objs = [self.score_label, self.restart_btn, self.start_btn, self.menu_btn, self.completed_label]
+            self.list_objs_canvas += list_objs
 
             self.option_chosen(self.option)       
 
     def start_clicked(self):
         if self.start_game == False and self.menu_clk == False:
-            self.btns_blank(self.dict_btn)
+            #self.btns_blank(self.dict_btn)
             self.start_game = True
 
     def menu_clicked(self):
         self.menu_clk = True
+
         list_objs = [self.score_label, self.restart_btn, self.start_btn, self.menu_btn, self.completed_label]
 
         self.completed = 0
 
         self.list_objs_canvas += list_objs
-        self.disable_btns()
         self.start_game = False
+        self.disable_btns()
 
         self.destroy_objs()
 
@@ -140,6 +149,7 @@ class memorama(Thread):
             self.dict_btn = {}
             self.count_obj = 0
             self.list_objs_canvas = []
+            self.menu_clk = False
             self.start_game_func()
 
     def start_game_func(self):
@@ -228,6 +238,11 @@ class memorama(Thread):
 
                     self.score_lvl = 0
                     self.option_chosen(self.option, n_max=self.n_max)
+                    self.disable_btns()
+
+                    list_objs = [self.restart_btn, self.start_btn, self.menu_btn, self.completed_label, self.score_label]
+                    self.list_objs_canvas += list_objs
+
                     self.destroy_objs_start
             else:
                 self.start_game = True
