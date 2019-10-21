@@ -11,7 +11,6 @@ from timer import Time
 
 #_thread.start_new_thread(update,())
 
-#TODO: fix bug by deactivating buttons,  where clicking restart menu or start make them stay on scene
 class memorama(Thread):
     def __init__(self, window):
         self.window = window
@@ -330,9 +329,9 @@ class memorama(Thread):
 
     def score(self, score):
         correct = 200
-        wrong = 10
+        wrong = 10 * self.wrong_ans if self.wrong_ans * 10 <= 200 else 200
 
-        score += (correct - (self.wrong_ans*wrong))
+        score += (correct - wrong)
 
         return score
 
