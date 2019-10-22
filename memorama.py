@@ -5,13 +5,11 @@
 '''
 from tkinter import * 
 from platform import system
-from threading import Thread
 from numpy.random import randint as rnd
-from timer import Time
 
 #_thread.start_new_thread(update,())
 
-class memorama(Thread):
+class memorama():
     def __init__(self, window):
         self.window = window
 
@@ -48,7 +46,7 @@ class memorama(Thread):
         self.menu_clk = False
         self.dict_btn = {}
 
-        self.window.geometry("400x300")
+        self.window.geometry(f"400x300+{int((self.window.winfo_screenwidth() / 2)- 350 / 2)}+{int((self.window.winfo_screenheight() / 2) - (400 / 2))}")
         self.title.grid(column=1, row=0)
         self.window.rowconfigure(1, minsize=1)
         self.window.columnconfigure(3, minsize=3)
@@ -146,7 +144,7 @@ class memorama(Thread):
             self.start_game_func()
 
     def start_game_func(self):
-            self.window.geometry("700x720")
+            self.window.geometry(f"700x720+{int((self.window.winfo_screenwidth() / 2) - (650 / 2))}+{int((self.window.winfo_screenheight() / 2) - (800 / 2))}")
 
             self.title.grid(column=2, row=0)
 
@@ -397,7 +395,7 @@ class memorama(Thread):
             self.menu_end()
 
     def menu_end(self):
-        self.window.geometry("400x420")
+        self.window.geometry(f"400x420+{int((self.window.winfo_screenwidth() / 2)- 350 / 2)}+{int((self.window.winfo_screenheight() / 2) - (400 / 2))}")
 
         spacer = Label(self.window, text="", padx=50)
         spacer.grid(column=0, row=0)
