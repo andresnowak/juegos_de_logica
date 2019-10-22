@@ -3,7 +3,7 @@
 || Name: Andres Nowak
 || Date: Wed Oct  9 09:19:51 CDT 2019
 '''
-from tkinter import *
+from tkinter import Tk
 from memorama import memorama
 
 def main():
