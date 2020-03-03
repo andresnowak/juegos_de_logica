@@ -1,4 +1,4 @@
-# Juegos de Logica
+# Memorama de matematicas
 
 * Memorama: Este juego es basicamente lo que dice el nombre un
 memorama, en donde el usuario tiene que juntar una operacion con su respectivo resultado.
